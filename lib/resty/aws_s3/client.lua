@@ -70,7 +70,15 @@ function _M.request(self, verb, uri, headers, body)
 end
 
 function _M.send_request(self, verb, uri, headers)
-	local http, err, errmsg = httpclient:new(self.endpoint, self.port, self.timeout)
+	local opts = {}
+	if self.use_ssl == true then
+		opts = {
+			ssl = self.use_ssl,
+			ssl_verify = false,
+		}
+	end
+
+    local http, err, errmsg = httpclient:new(self.endpoint, self.port, self.timeout, opts)
 
     if err ~= nil then
         return nil, 'NewHttpError', string.format(
