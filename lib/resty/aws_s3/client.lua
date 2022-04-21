@@ -11,7 +11,7 @@ local _M = {}
 local mt = { __index = _M }
 
 
-function _M.new(access_key, secret_key, endpoint, client_opts)
+function _M.new(access_key, secret_key, endpoint, port, client_opts)
     if type(endpoint) ~= 'string' then
         return nil, 'InvalidArgument', string.format(
                 'invalid endpoint: %s is not a string', tostring(endpoint))
@@ -36,7 +36,9 @@ function _M.new(access_key, secret_key, endpoint, client_opts)
     local client = {
         signer = signer,
         endpoint = endpoint,
+        port = port,
         timeout = client_opts.timeout or 1000 * 60,
+        use_ssl = client_opts.use_ssl or true,
     }
 
     setmetatable(client, mt)
@@ -68,7 +70,8 @@ function _M.request(self, verb, uri, headers, body)
 end
 
 function _M.send_request(self, verb, uri, headers)
-    local http, err, errmsg = httpclient:new(self.endpoint, 80, self.timeout)
+	local http, err, errmsg = httpclient:new(self.endpoint, self.port, self.timeout)
+
     if err ~= nil then
         return nil, 'NewHttpError', string.format(
                 'failed to new http client, %s, %s', err, errmsg)
