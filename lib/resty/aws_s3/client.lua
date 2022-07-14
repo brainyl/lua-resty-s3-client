@@ -11,16 +11,17 @@ local _M = {}
 local mt = { __index = _M }
 
 
-function _M.new(access_key, secret_key, endpoint, port, client_opts)
+function _M.new(access_key, secret_key, endpoint, port, client_opts, opts)
     if type(endpoint) ~= 'string' then
         return nil, 'InvalidArgument', string.format(
                 'invalid endpoint: %s is not a string', tostring(endpoint))
     end
 
     local signer, err, errmsg
+    opts = opts or {}
 
     if access_key ~= nil and secret_key ~= nil then
-        signer, err, errmsg = aws_singer.new(access_key, secret_key)
+        signer, err, errmsg = aws_singer.new(access_key, secret_key, opts)
         if err ~= nil then
             return nil, err, errmsg
         end
